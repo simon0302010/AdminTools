@@ -21,6 +21,18 @@ public class Admintools implements ModInitializer {
                             .executes(InventoryView::showInventory)
                     )
             );
+            dispatcher.register(CommandManager.literal("freeze")
+                    .requires(source -> source.hasPermissionLevel(1))
+                    .then(CommandManager.argument("player", EntityArgumentType.player())
+                            .executes(FreezePlayer::freezePlayer)
+                    )
+            );
+            dispatcher.register(CommandManager.literal("unfreeze")
+                    .requires(source -> source.hasPermissionLevel(1))
+                    .then(CommandManager.argument("player", EntityArgumentType.player())
+                            .executes(FreezePlayer::unfreezePlayer)
+                    )
+            );
         });
     }
 }
