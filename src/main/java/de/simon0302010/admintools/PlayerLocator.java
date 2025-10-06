@@ -12,6 +12,7 @@ public class PlayerLocator
     static int getLocation(CommandContext<ServerCommandSource> context) {
         try {
             ServerPlayerEntity player = EntityArgumentType.getPlayer(context, "player");
+            // get clean string of world player is in
             String playerWorld = player.getWorld().getRegistryKey().getValue().toString().replaceFirst("^minecraft:", "").replaceFirst("^the_", "");
             context.getSource().sendFeedback(
                     () -> Text.literal(

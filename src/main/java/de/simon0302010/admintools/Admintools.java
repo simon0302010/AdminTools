@@ -15,6 +15,10 @@ public class Admintools implements ModInitializer {
                             .executes(PlayerLocator::getLocation)
                     )
             );
+            dispatcher.register(CommandManager.literal("invsee")
+                    .requires(source -> source.hasPermissionLevel(1))
+                    .executes(InventoryView::showInventory)
+            );
         });
     }
 }
