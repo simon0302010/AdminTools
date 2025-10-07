@@ -14,25 +14,24 @@ public class FreezePlayer {
     static int freezePlayer(CommandContext<ServerCommandSource> context) {
         try {
             ServerPlayerEntity player = EntityArgumentType.getPlayer(context, "player");
-            ServerPlayerEntity viewer = context.getSource().getPlayer();
-            StatusEffectInstance effect = new StatusEffectInstance(
-                    StatusEffects.RESISTANCE,
-                    Integer.MAX_VALUE,
-                    254,
-                    true,
-                    false,
-                    false
-            );
-            player.addStatusEffect(effect);
-            FreezeState.freeze(player);
-            player.setNoGravity(true);
-            player.sendMessage(Text.literal("§aYou are now frozen."));
-            context.getSource().sendFeedback(
-                    () -> Text.literal(
-                            "%s is now frozen.".formatted(player.getName().getString())
-                    ),
-                    false
-            );
+
+            if (!FreezeState.isFrozen(player)) {
+                FreezeState.freeze(player);
+                player.setNoGravity(true);
+
+                player.getAbilities().allowFlying = true;
+                player.getAbilities().invulnerable = true;
+
+                player.sendMessage(Text.literal("§aYou are now frozen."));
+                context.getSource().sendFeedback(
+                        () -> Text.literal(
+                                "%s is now frozen.".formatted(player.getName().getString())
+                        ),
+                        false
+                );
+            } else {
+                context.getSource().sendError(Text.literal("%s is already frozen".formatted(player.getName().getString())));
+            }
         } catch (CommandSyntaxException e) {
             context.getSource().sendError(Text.literal("Player not found."));
         }
@@ -41,17 +40,26 @@ public class FreezePlayer {
     static int unfreezePlayer(CommandContext<ServerCommandSource> context) {
         try {
             ServerPlayerEntity player = EntityArgumentType.getPlayer(context, "player");
-            ServerPlayerEntity viewer = context.getSource().getPlayer();
-            player.removeStatusEffect(StatusEffects.RESISTANCE);
-            FreezeState.unfreeze(player);
-            player.setNoGravity(false);
-            player.sendMessage(Text.literal("§aYou are no longer frozen."));
-            context.getSource().sendFeedback(
-                    () -> Text.literal(
-                            "%s is no longer frozen.".formatted(player.getName().getString())
-                    ),
-                    false
-            );
+
+            if (FreezeState.isFrozen(player)) {
+                FreezeState.unfreeze(player);
+                player.setNoGravity(false);
+
+                player.getAbilities().allowFlying = player.isCreative() || player.isSpectator();
+                player.getAbilities().flying = false;
+                player.getAbilities().invulnerable = player.isCreative() || player.isSpectator();
+                player.sendAbilitiesUpdate();
+
+                player.sendMessage(Text.literal("§aYou are no longer frozen."));
+                context.getSource().sendFeedback(
+                        () -> Text.literal(
+                                "%s is no longer frozen.".formatted(player.getName().getString())
+                        ),
+                        false
+                );
+            } else {
+                context.getSource().sendError(Text.literal("%s is not frozen.".formatted(player.getName().getString())));
+            }
         } catch (CommandSyntaxException e) {
             context.getSource().sendError(Text.literal("Player not found."));
         }

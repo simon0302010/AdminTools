@@ -28,4 +28,8 @@ public class FreezeState {
     public static Map<UUID, Vec3d> getAllFrozen() {
         return frozenPlayers;
     }
+
+    public static void clearAll() {
+        frozenPlayers.clear();
+    }
 }
