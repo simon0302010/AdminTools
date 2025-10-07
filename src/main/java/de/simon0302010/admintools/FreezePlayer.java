@@ -8,6 +8,7 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.text.Text;
+import de.simon0302010.admintools.FreezeState;
 
 public class FreezePlayer {
     static int freezePlayer(CommandContext<ServerCommandSource> context) {
@@ -23,6 +24,8 @@ public class FreezePlayer {
                     false
             );
             player.addStatusEffect(effect);
+            FreezeState.freeze(player);
+            player.setNoGravity(true);
             player.sendMessage(Text.literal("§aYou are now frozen."));
             context.getSource().sendFeedback(
                     () -> Text.literal(
@@ -40,6 +43,8 @@ public class FreezePlayer {
             ServerPlayerEntity player = EntityArgumentType.getPlayer(context, "player");
             ServerPlayerEntity viewer = context.getSource().getPlayer();
             player.removeStatusEffect(StatusEffects.RESISTANCE);
+            FreezeState.unfreeze(player);
+            player.setNoGravity(false);
             player.sendMessage(Text.literal("§aYou are no longer frozen."));
             context.getSource().sendFeedback(
                     () -> Text.literal(
